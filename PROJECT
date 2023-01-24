@@ -1,0 +1,29 @@
+domain: pandurang.com
+layout:
+- go.kubebuilder.io/v3
+multigroup: true
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: vmstate-operator-pkr
+repo: github.com/pandurangkhandeparker/vmstate-operator-pkr
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: pandurang.com
+  group: aws
+  kind: PandurangAWSEC2
+  path: github.com/pandurangkhandeparker/vmstate-operator-pkr/apis/aws/v1
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: pandurang.com
+  group: aws
+  kind: PandurangAWSManager
+  path: github.com/pandurangkhandeparker/vmstate-operator-pkr/apis/aws/v1
+  version: v1
+version: "3"

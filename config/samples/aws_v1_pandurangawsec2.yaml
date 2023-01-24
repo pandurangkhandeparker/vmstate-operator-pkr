@@ -1,0 +1,12 @@
+apiVersion: aws.pandurang.com/v1
+kind: PandurangAWSEC2
+metadata:
+  labels:
+    app.kubernetes.io/name: pandurangawsec2
+    app.kubernetes.io/instance: pandurangawsec2-sample
+    app.kubernetes.io/part-of: vmstate-operator-pkr
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: vmstate-operator-pkr
+  name: pandurangawsec2-sample
+spec:
+  # TODO(user): Add fields here

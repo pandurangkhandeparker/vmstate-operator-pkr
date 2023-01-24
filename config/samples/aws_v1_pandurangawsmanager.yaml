@@ -1,0 +1,12 @@
+apiVersion: aws.pandurang.com/v1
+kind: PandurangAWSManager
+metadata:
+  labels:
+    app.kubernetes.io/name: pandurangawsmanager
+    app.kubernetes.io/instance: pandurangawsmanager-sample
+    app.kubernetes.io/part-of: vmstate-operator-pkr
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: vmstate-operator-pkr
+  name: pandurangawsmanager-sample
+spec:
+  # TODO(user): Add fields here
