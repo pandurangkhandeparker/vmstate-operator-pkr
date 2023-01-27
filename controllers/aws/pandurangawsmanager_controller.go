@@ -228,9 +228,9 @@ func (r *PandurangAWSManagerReconciler) DeploymentForAWSManager(ctx context.Cont
 									},
 								},
 							}},
-						ImagePullPolicy: "Always",
+						// ImagePullPolicy: "Always",
 					}}, // Container
-					RestartPolicy: "OnFailure",
+					// RestartPolicy: "OnFailure",
 				}, // PodSec
 			}, // PodTemplateSpec
 		}, // Spec

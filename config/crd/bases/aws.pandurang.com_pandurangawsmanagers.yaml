@@ -40,10 +40,6 @@ spec:
                 description: Foo is an example field of PandurangAWSManager. Edit
                   pandurangawsmanager_types.go to remove/update
                 type: string
-              imagePullPolicy:
-                type: string
-              restartPolicy:
-                type: string
             type: object
           status:
             description: PandurangAWSManagerStatus defines the observed state of PandurangAWSManager

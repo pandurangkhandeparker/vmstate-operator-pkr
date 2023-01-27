@@ -29,9 +29,9 @@ type PandurangAWSManagerSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of PandurangAWSManager. Edit pandurangawsmanager_types.go to remove/update
-	Image           string `json:"image,omitempty"`
-	ImagePullPolicy string `json:"imagePullPolicy,omitempty"`
-	RestartPolicy   string `json:"restartPolicy,omitempty"`
+	Image string `json:"image,omitempty"`
+	// ImagePullPolicy string `json:"imagePullPolicy,omitempty"`
+	// RestartPolicy   string `json:"restartPolicy,omitempty"`
 }
 
 // PandurangAWSManagerStatus defines the observed state of PandurangAWSManager
