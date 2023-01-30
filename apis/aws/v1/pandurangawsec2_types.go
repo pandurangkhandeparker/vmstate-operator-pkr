@@ -31,7 +31,10 @@ type PandurangAWSEC2Spec struct {
 	// Foo is an example field of PandurangAWSEC2. Edit pandurangawsec2_types.go to remove/update
 	Image           string `json:"image,omitempty"`
 	ImagePullPolicy string `json:"imagePullPolicy,omitempty"`
-	// RestartPolicy   string `json:"restartPolicy,omitempty"`
+	RestartPolicy   string `json:"restartPolicy,omitempty"`
+	Command         string `json:"command,omitempty"`
+	TagKey          string `json:"tagKey,omitempty"`
+	TagValue        string `json:"tagVal,omitempty"`
 }
 
 // PandurangAWSEC2Status defines the observed state of PandurangAWSEC2

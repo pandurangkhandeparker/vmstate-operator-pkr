@@ -99,7 +99,7 @@ func (r *PandurangAWSEC2Reconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	//log.Info(*found.)
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new Job
-		job := r.JobForAWSEC2(awsEC2, "create", "POC", "PandurangGolangOperator")
+		job := r.JobForAWSEC2(awsEC2, "create")
 		log.Info("Creating a new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
 		err = r.Client.Create(ctx, job)
 		if err != nil {
@@ -243,7 +243,7 @@ func (r *PandurangAWSEC2Reconciler) finalizeAWSEC2(ctx context.Context, awsEC2 *
 	//log.Info(*found.)
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new job
-		job := r.JobForAWSEC2(awsEC2, "delete", "POC", "PandurangGolangOperator")
+		job := r.JobForAWSEC2(awsEC2, "delete")
 		log.Info("Creating a new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
 		err = r.Client.Create(ctx, job)
 		if err != nil {
@@ -260,7 +260,7 @@ func (r *PandurangAWSEC2Reconciler) finalizeAWSEC2(ctx context.Context, awsEC2 *
 }
 
 // Job Spec
-func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, command string, key string, val string) *batchv1.Job {
+func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, command string) *batchv1.Job {
 	jobName := awsEC2.Name + command
 	job := &batchv1.Job{
 		ObjectMeta: v1.ObjectMeta{
@@ -277,15 +277,15 @@ func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, 
 						Env: []corev1.EnvVar{
 							{
 								Name:  "ec2_command",
-								Value: command,
+								Value: awsEC2.Spec.Command,
 							},
 							{
 								Name:  "ec2_tag_key",
-								Value: key,
+								Value: awsEC2.Spec.TagKey,
 							},
 							{
 								Name:  "ec2_tag_value",
-								Value: val,
+								Value: awsEC2.Spec.TagValue,
 							},
 							{
 								Name: "AWS_ACCESS_KEY_ID",
@@ -322,7 +322,7 @@ func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, 
 							}},
 						ImagePullPolicy: "Always",
 					}},
-					// RestartPolicy: "Always",
+					RestartPolicy: "OnFailure",
 				},
 			},
 		},

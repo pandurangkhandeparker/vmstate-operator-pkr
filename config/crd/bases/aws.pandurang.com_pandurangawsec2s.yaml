@@ -35,11 +35,19 @@ spec:
           spec:
             description: PandurangAWSEC2Spec defines the desired state of PandurangAWSEC2
             properties:
+              command:
+                type: string
               image:
                 description: Foo is an example field of PandurangAWSEC2. Edit pandurangawsec2_types.go
                   to remove/update
                 type: string
               imagePullPolicy:
+                type: string
+              restartPolicy:
+                type: string
+              tagKey:
+                type: string
+              tagVal:
                 type: string
             type: object
           status:
