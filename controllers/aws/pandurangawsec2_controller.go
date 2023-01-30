@@ -288,6 +288,28 @@ func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, 
 								Value: awsEC2.Spec.TagValue,
 							},
 							{
+								Name: "ec2_instance_type",
+								ValueFrom: &corev1.EnvVarSource{
+									ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "aws-configmap",
+										},
+										Key: "instance-type",
+									},
+								},
+							},
+							{
+								Name: "ec2_image_id",
+								ValueFrom: &corev1.EnvVarSource{
+									ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "aws-configmap",
+										},
+										Key: "image-id",
+									},
+								},
+							},
+							{
 								Name: "AWS_ACCESS_KEY_ID",
 								ValueFrom: &corev1.EnvVarSource{
 									SecretKeyRef: &corev1.SecretKeySelector{
