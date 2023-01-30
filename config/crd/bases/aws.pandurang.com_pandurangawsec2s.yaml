@@ -39,6 +39,8 @@ spec:
                 description: Foo is an example field of PandurangAWSEC2. Edit pandurangawsec2_types.go
                   to remove/update
                 type: string
+              imagePullPolicy:
+                type: string
             type: object
           status:
             description: PandurangAWSEC2Status defines the observed state of PandurangAWSEC2
