@@ -49,6 +49,10 @@ spec:
                 type: string
               tagVal:
                 type: string
+            required:
+            - command
+            - tagKey
+            - tagVal
             type: object
           status:
             description: PandurangAWSEC2Status defines the observed state of PandurangAWSEC2

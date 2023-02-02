@@ -100,7 +100,6 @@ func (r *PandurangAWSEC2Reconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new Job
 		job := r.JobForAWSEC2(awsEC2, "create")
-		// job := r.JobForAWSEC2(awsEC2, "delete")
 		log.Info("Creating a new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
 		err = r.Client.Create(ctx, job)
 		if err != nil {

@@ -10,7 +10,7 @@ metadata:
   name: pandurangawsec2-sample
 spec:
   # TODO(user): Add fields here
-  image: "quay.io/manoj_dhanorkar/aws-vmcreate:v2.0-pk"
+  image: "quay.io/manoj_dhanorkar/aws-vmcreate:v3.1-pk"
   imagePullPolicy: Always
   restartPolicy: OnFailure
   command: "create"

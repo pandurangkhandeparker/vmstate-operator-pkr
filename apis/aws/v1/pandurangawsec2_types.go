@@ -32,9 +32,9 @@ type PandurangAWSEC2Spec struct {
 	Image           string `json:"image,omitempty"`
 	ImagePullPolicy string `json:"imagePullPolicy,omitempty"`
 	RestartPolicy   string `json:"restartPolicy,omitempty"`
-	Command         string `json:"command,omitempty"`
-	TagKey          string `json:"tagKey,omitempty"`
-	TagValue        string `json:"tagVal,omitempty"`
+	Command         string `json:"command"`
+	TagKey          string `json:"tagKey"`
+	TagValue        string `json:"tagVal"`
 }
 
 // PandurangAWSEC2Status defines the observed state of PandurangAWSEC2
