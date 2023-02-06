@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: quay.io/manoj_dhanorkar/vmstate-operator-pk
-  newTag: v3.1.1-pk
+  newTag: v3.3-pk

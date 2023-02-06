@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -29,18 +30,19 @@ type PandurangAWSEC2Spec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of PandurangAWSEC2. Edit pandurangawsec2_types.go to remove/update
-	Image           string `json:"image,omitempty"`
-	ImagePullPolicy string `json:"imagePullPolicy,omitempty"`
-	RestartPolicy   string `json:"restartPolicy,omitempty"`
-	Command         string `json:"command"`
-	TagKey          string `json:"tagKey"`
-	TagValue        string `json:"tagVal"`
+	Image           string           `json:"image,omitempty"`
+	ImagePullPolicy v1.PullPolicy    `json:"imagePullPolicy,omitempty"`
+	RestartPolicy   v1.RestartPolicy `json:"restartPolicy,omitempty"`
+	Command         string           `json:"command"`
+	TagKey          string           `json:"tagKey"`
+	TagValue        string           `json:"tagVal"`
 }
 
 // PandurangAWSEC2Status defines the observed state of PandurangAWSEC2
 type PandurangAWSEC2Status struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	EC2Status string `json:"ec2status"`
 }
 
 //+kubebuilder:object:root=true

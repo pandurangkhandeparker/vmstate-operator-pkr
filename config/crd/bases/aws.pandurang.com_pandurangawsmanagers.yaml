@@ -41,7 +41,7 @@ spec:
                   pandurangawsmanager_types.go to remove/update
                 type: string
               restartPolicy:
-                description: ImagePullPolicy string `json:"imagePullPolicy,omitempty"`
+                description: ImagePullPolicy v1.PullPolicy    `json:"imagePullPolicy,omitempty"`
                 type: string
             type: object
           status:

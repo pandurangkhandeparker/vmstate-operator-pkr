@@ -42,8 +42,14 @@ spec:
                   to remove/update
                 type: string
               imagePullPolicy:
+                description: PullPolicy describes a policy for if/when to pull a container
+                  image
                 type: string
               restartPolicy:
+                description: RestartPolicy describes how the container should be restarted.
+                  Only one of the following restart policies may be specified. If
+                  none of the following policies is specified, the default one is
+                  RestartPolicyAlways.
                 type: string
               tagKey:
                 type: string
@@ -56,6 +62,14 @@ spec:
             type: object
           status:
             description: PandurangAWSEC2Status defines the observed state of PandurangAWSEC2
+            properties:
+              ec2status:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
+            required:
+            - ec2status
             type: object
         type: object
     served: true

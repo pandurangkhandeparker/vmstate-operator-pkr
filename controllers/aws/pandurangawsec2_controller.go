@@ -18,11 +18,12 @@ package aws
 
 import (
 	"context"
-
+	"fmt"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -37,12 +38,14 @@ import (
 // PandurangAWSEC2Reconciler reconciles a PandurangAWSEC2 object
 type PandurangAWSEC2Reconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme   *runtime.Scheme
+	recorder record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=aws.pandurang.com,resources=pandurangawsec2s,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=aws.pandurang.com,resources=pandurangawsec2s/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=aws.pandurang.com,resources=pandurangawsec2s/finalizers,verbs=update
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -88,11 +91,16 @@ func (r *PandurangAWSEC2Reconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		log.Error(err, "Failed to get awsEC2.")
 		return ctrl.Result{}, err
 	}
-
+	log.Info(awsEC2.Name)
 	// Add const values for mandatory specs ( if left blank)
 	// log.Info("Adding awsEC2 mandatory specs")
 	// utils.AddBackupMandatorySpecs(awsEC2)
-	// Check if the jobJob already exists, if not create a new one
+	// Check if the Job already exists, if not create a new one
+
+	awsEC2.Status.EC2Status = "Starting a Job"
+	fmt.Println(awsEC2.Status.EC2Status)
+
+	r.recorder.Event(awsEC2, corev1.EventTypeNormal, "Starting", fmt.Sprintf("Starting a Job"))
 
 	found := &batchv1.Job{}
 	err = r.Client.Get(ctx, types.NamespacedName{Name: awsEC2.Name + "create", Namespace: awsEC2.Namespace}, found)
@@ -101,12 +109,30 @@ func (r *PandurangAWSEC2Reconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		// Define a new Job
 		job := r.JobForAWSEC2(awsEC2, "create")
 		log.Info("Creating a new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
+
+		awsEC2.Status.EC2Status = "In Progress: Creating EC2 instance"
+		fmt.Println(awsEC2.Status.EC2Status)
+
+		r.recorder.Event(awsEC2, corev1.EventTypeNormal, "In Progress", fmt.Sprintf("In Progress: Creating EC2 instance  %s/%s", awsEC2.Namespace, awsEC2.Name))
+
 		err = r.Client.Create(ctx, job)
 		if err != nil {
 			log.Error(err, "Failed to create new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
+
+			awsEC2.Status.EC2Status = "Failed"
+			fmt.Println(awsEC2.Status.EC2Status)
+
+			r.recorder.Event(awsEC2, corev1.EventTypeNormal, "Failed", fmt.Sprintf("Failed"))
+
 			return ctrl.Result{}, err
 		}
 		// job created successfully - return and requeue
+
+		awsEC2.Status.EC2Status = "Completed"
+		fmt.Println(awsEC2.Status.EC2Status)
+
+		r.recorder.Event(awsEC2, corev1.EventTypeNormal, "Completed", fmt.Sprintf("Completed Job"))
+
 		return ctrl.Result{Requeue: true}, nil
 	} else if err != nil {
 		log.Error(err, "Failed to get job")
@@ -243,14 +269,20 @@ func (r *PandurangAWSEC2Reconciler) finalizeAWSEC2(ctx context.Context, awsEC2 *
 	//log.Info(*found.)
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new job
+		awsEC2.Status.EC2Status = "In Progress"
+		fmt.Println(awsEC2.Status.EC2Status)
 		job := r.JobForAWSEC2(awsEC2, "delete")
 		log.Info("Creating a new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
 		err = r.Client.Create(ctx, job)
 		if err != nil {
 			log.Error(err, "Failed to create new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
+			awsEC2.Status.EC2Status = "Failed"
+			fmt.Println(awsEC2.Status.EC2Status)
 			return err
 		}
 		// job created successfully - return and requeue
+		awsEC2.Status.EC2Status = "Completed"
+		fmt.Println(awsEC2.Status.EC2Status)
 		return nil
 	} else if err != nil {
 		log.Error(err, "Failed to get job")
@@ -342,9 +374,9 @@ func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, 
 									},
 								},
 							}},
-						ImagePullPolicy: "Always",
+						ImagePullPolicy: awsEC2.Spec.ImagePullPolicy,
 					}},
-					RestartPolicy: "OnFailure",
+					RestartPolicy: awsEC2.Spec.RestartPolicy,
 				},
 			},
 		},
@@ -364,6 +396,8 @@ func AWSEC2Labels(v *awsv1.PandurangAWSEC2, tier string) map[string]string {
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *PandurangAWSEC2Reconciler) SetupWithManager(mgr ctrl.Manager) error {
+	r.recorder = mgr.GetEventRecorderFor("PandurangAWSEC2")
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&awsv1.PandurangAWSEC2{}).
 		Owns(&batchv1.Job{}).

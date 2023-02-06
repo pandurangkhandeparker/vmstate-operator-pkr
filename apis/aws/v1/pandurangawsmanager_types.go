@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -30,8 +31,8 @@ type PandurangAWSManagerSpec struct {
 
 	// Foo is an example field of PandurangAWSManager. Edit pandurangawsmanager_types.go to remove/update
 	Image string `json:"image,omitempty"`
-	// ImagePullPolicy string `json:"imagePullPolicy,omitempty"`
-	RestartPolicy string `json:"restartPolicy,omitempty"`
+	// ImagePullPolicy v1.PullPolicy    `json:"imagePullPolicy,omitempty"`
+	RestartPolicy v1.RestartPolicy `json:"restartPolicy,omitempty"`
 }
 
 // PandurangAWSManagerStatus defines the observed state of PandurangAWSManager
