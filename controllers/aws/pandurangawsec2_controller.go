@@ -303,9 +303,23 @@ func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, 
 		Spec: batchv1.JobSpec{
 			Template: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
+					Volumes: []corev1.Volume{{
+						Name: "configmap-volume",
+						VolumeSource: corev1.VolumeSource{
+							ConfigMap: &corev1.ConfigMapVolumeSource{
+								LocalObjectReference: corev1.LocalObjectReference{
+									Name: "aws-configmap",
+								},
+							},
+						},
+					}},
 					Containers: []corev1.Container{{
 						Name:  awsEC2.Name,
 						Image: awsEC2.Spec.Image,
+						VolumeMounts: []corev1.VolumeMount{{
+							Name:      "configmap-volume",
+							MountPath: "/opt/",
+						}},
 						Env: []corev1.EnvVar{
 							{
 								Name:  "ec2_command",
@@ -320,26 +334,12 @@ func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, 
 								Value: awsEC2.Spec.TagValue,
 							},
 							{
-								Name: "ec2_instance_type",
-								ValueFrom: &corev1.EnvVarSource{
-									ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
-										LocalObjectReference: corev1.LocalObjectReference{
-											Name: "aws-configmap",
-										},
-										Key: "instance-type",
-									},
-								},
+								Name:  "ec2_instance_type",
+								Value: "/opt/keys/instance-type",
 							},
 							{
-								Name: "ec2_image_id",
-								ValueFrom: &corev1.EnvVarSource{
-									ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
-										LocalObjectReference: corev1.LocalObjectReference{
-											Name: "aws-configmap",
-										},
-										Key: "image-id",
-									},
-								},
+								Name:  "ec2_image_id",
+								Value: "/opt/keys/image-id",
 							},
 							{
 								Name: "AWS_ACCESS_KEY_ID",
