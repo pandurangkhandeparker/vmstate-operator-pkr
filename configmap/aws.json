@@ -1,0 +1,4 @@
+{
+    "instanceType": "t2.micro",
+    "imageId": "ami-0d0ca2066b861631c"
+}

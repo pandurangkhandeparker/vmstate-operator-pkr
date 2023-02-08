@@ -36,6 +36,7 @@ type PandurangAWSEC2Spec struct {
 	Command         string           `json:"command"`
 	TagKey          string           `json:"tagKey"`
 	TagValue        string           `json:"tagVal"`
+	CfgMap          string           `json:"cfgmap"`
 }
 
 // PandurangAWSEC2Status defines the observed state of PandurangAWSEC2

@@ -18,17 +18,23 @@ package aws
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/record"
+	// "knative.dev/pkg/configmap"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	awsv1 "github.com/pandurangkhandeparker/vmstate-operator-pkr/apis/aws/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -107,7 +113,7 @@ func (r *PandurangAWSEC2Reconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	//log.Info(*found.)
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new Job
-		job := r.JobForAWSEC2(awsEC2, "create")
+		job := r.JobForAWSEC2(ctx, awsEC2, "create")
 		log.Info("Creating a new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
 
 		awsEC2.Status.EC2Status = "In Progress: Creating EC2 instance"
@@ -271,7 +277,7 @@ func (r *PandurangAWSEC2Reconciler) finalizeAWSEC2(ctx context.Context, awsEC2 *
 		// Define a new job
 		awsEC2.Status.EC2Status = "In Progress"
 		fmt.Println(awsEC2.Status.EC2Status)
-		job := r.JobForAWSEC2(awsEC2, "delete")
+		job := r.JobForAWSEC2(ctx, awsEC2, "delete")
 		log.Info("Creating a new Job", "job.Namespace", job.Namespace, "job.Name", job.Name)
 		err = r.Client.Create(ctx, job)
 		if err != nil {
@@ -291,8 +297,30 @@ func (r *PandurangAWSEC2Reconciler) finalizeAWSEC2(ctx context.Context, awsEC2 *
 	return nil
 }
 
+type AWScm struct {
+	InstanceType string `json:"instanceType"`
+	ImageId      string `json:"imageId"`
+}
+
 // Job Spec
-func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, command string) *batchv1.Job {
+func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(ctx context.Context, awsEC2 *awsv1.PandurangAWSEC2, command string) *batchv1.Job {
+
+	var awscm AWScm
+	// cfgData, _ := configmap.Load("aws-configmap")
+	// json.Unmarshal([]byte(cfgData["aws.json"]), &cm)
+
+	cfg, _ := rest.InClusterConfig()
+	clientset, _ := kubernetes.NewForConfig(cfg)
+
+	cm, _ := clientset.CoreV1().ConfigMaps(awsEC2.Namespace).Get(ctx, awsEC2.Spec.CfgMap, metav1.GetOptions{})
+
+	cfgData := cm.Data["aws.json"]
+
+	err := json.Unmarshal([]byte(cfgData), &awscm)
+	if err != nil {
+		panic(err)
+	}
+
 	jobName := awsEC2.Name + command
 	job := &batchv1.Job{
 		ObjectMeta: v1.ObjectMeta{
@@ -318,7 +346,7 @@ func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, 
 						Image: awsEC2.Spec.Image,
 						VolumeMounts: []corev1.VolumeMount{{
 							Name:      "configmap-volume",
-							MountPath: "/opt/",
+							MountPath: "/opt/aws.json",
 						}},
 						Env: []corev1.EnvVar{
 							{
@@ -335,11 +363,11 @@ func (r *PandurangAWSEC2Reconciler) JobForAWSEC2(awsEC2 *awsv1.PandurangAWSEC2, 
 							},
 							{
 								Name:  "ec2_instance_type",
-								Value: "/opt/keys/instance-type",
+								Value: awscm.InstanceType,
 							},
 							{
 								Name:  "ec2_image_id",
-								Value: "/opt/keys/image-id",
+								Value: awscm.ImageId,
 							},
 							{
 								Name: "AWS_ACCESS_KEY_ID",

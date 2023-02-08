@@ -3,8 +3,11 @@ kind: ConfigMap
 metadata:
   name: aws-configmap
 data:
-  instance-type: t2.micro 
-  image-id: ami-0d0ca2066b861631c
+  aws.json: |
+    {
+      "instanceType": "t2.micro",
+      "imageId": "ami-0d0ca2066b861631c"
+    }
 
 ---
 apiVersion: v1

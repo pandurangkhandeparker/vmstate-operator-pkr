@@ -13,6 +13,7 @@ spec:
   image: "quay.io/manoj_dhanorkar/aws-vmcreate:v4-pk"
   imagePullPolicy: "Always"
   restartPolicy: "OnFailure"
-  command: "delete"
+  command: "create"
   tagKey: "POC"
   tagVal: "PandurangGolangOperator"
+  cfgmap: "aws-configmap"

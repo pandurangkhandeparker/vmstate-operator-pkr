@@ -35,6 +35,8 @@ spec:
           spec:
             description: PandurangAWSEC2Spec defines the desired state of PandurangAWSEC2
             properties:
+              cfgmap:
+                type: string
               command:
                 type: string
               image:
@@ -56,6 +58,7 @@ spec:
               tagVal:
                 type: string
             required:
+            - cfgmap
             - command
             - tagKey
             - tagVal
